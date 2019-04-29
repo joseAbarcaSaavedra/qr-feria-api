@@ -1,4 +1,8 @@
+import { authKey } from '../../config'
 const { validate } = require('rut.js')
+const jwt = require('jsonwebtoken')
+const path = require('path')
+const fs = require('fs')
 
 export const typeCheck = username => {
   var typeCheck = '4'
@@ -13,4 +17,39 @@ export const typeCheck = username => {
     typeCheck = '1'
   }
   return typeCheck
+}
+
+export const signJWT = async data => {
+  const privateKey = fs.readFileSync(authKey.private)
+  console.log(
+    'KEYS',
+    JSON.stringify({
+      private: authKey.privateVal,
+      public: authKey.publicVal
+    }).replace(/ /g, '')
+  )
+  return new Promise((resolve, reject) => {
+    jwt.sign(
+      data,
+      privateKey,
+      {
+        expiresIn: authKey.expirationTime,
+        algorithm: 'RS256'
+      },
+      (err, token) => {
+        if (err) reject(err)
+        else resolve(token)
+      }
+    )
+  })
+}
+
+export const verifyJWT = async token => {
+  const publicKey = fs.readFileSync(authKey.public)
+  return new Promise((resolve, reject) => {
+    jwt.verify(token, publicKey, { algorithm: 'HS256' }, (err, token) => {
+      if (err) reject(err)
+      else resolve(token)
+    })
+  })
 }

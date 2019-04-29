@@ -3,7 +3,7 @@ import user from './user'
 
 const router = new Router()
 
-router.use('/users', user)
+router.use('/api/users', user)
 
 /**
  * @apiDefine listParams

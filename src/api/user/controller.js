@@ -1,12 +1,14 @@
 import { success, notFound, fail } from '../../services/response/'
 import { User } from '.'
-import { typeCheck } from '../../services/auth/index'
-import { domain, ws, authKey } from '../../config'
+import { typeCheck, signJWT, verifyJWT } from '../../services/auth/index'
+import { domain, ws } from '../../config'
 import _merge from 'lodash/merge'
+import _get from 'lodash/get'
+import _map from 'lodash/map'
+
 const base64 = require('base-64')
 const fetch = require('node-fetch')
 const queryString = require('query-string')
-const jwt = require('jsonwebtoken')
 
 export const create = ({ bodymen: { body } }, res, next) =>
   User.create(body)
@@ -71,37 +73,63 @@ export const auth = async (req, res) => {
 
     if (response.status === 'OK') {
       const { data } = response
-      // New Session
-
-      jwt.sign(
-        JSON.stringify({ foo: 'asdads' }),
-        /* authKey.private */ 'la que colgate',
-        { algorithm: 'RS256', expiresIn: '12h' },
-        (err, token) => {
-          if (err) {
-            console.log('err', err)
-            fail(res)({
-              error: true,
-              message: 'Ocurrio un problema, intenta nuevamente.'
-            })
-          } else {
-            success(res)({
-              jwt: token,
-              data
-            })
+      const applicantId = base64.decode(data.applicantId)
+      // Get CV
+      try {
+        const cvRequest = await fetch(
+          `${ws.service.cv.url}${
+            ws.service.cv.path
+          }${applicantId}?${queryString.stringify(ws.service.cv.params)}`,
+          {
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' }
           }
+        )
+        const cvResponse = await cvRequest.json()
+        // console.log('personalInfo', personalInfo)
+        data.user = {
+          firstName: _get(cvResponse, 'data.personalInfo.firstName', ''),
+          middleName: _get(cvResponse, 'data.personalInfo.middleName', ''),
+          lastName: _get(cvResponse, 'data.personalInfo.lastName', ''),
+          maidenName: _get(cvResponse, 'data.personalInfo.maidenName', ''),
+          email: _get(cvResponse, 'data.personalInfo.emails.primaryEmail', ''),
+          picture: _get(cvResponse, 'data.personalInfo.picture', ''),
+          phone: _get(
+            _get(cvResponse, 'data.personalInfo.phoneNumbers', []).filter(
+              phone => phone.place === 'mobile'
+            ),
+            '[0].number',
+            ''
+          ),
+          role: 'applicant',
+          cvUrl: 'http://google.cl'
         }
-      )
+        // console.log('cvResponse', cvResponse)
+        // const applicantId = base64.decode(data.applicantId)
+        // New Session
+        const token = await signJWT(data)
+
+        /* const d = await verifyJWT(token)
+        console.log('verify: ', d) */
+        success(res)({
+          jwt: token,
+          // userData: cvResponse.data,
+          user: data.user
+        })
+      } catch (error) {
+        console.log('error', error)
+        fail(res)({
+          message: 'Ocurrio un problema, intenta nuevamente. (-1)'
+        })
+      }
     } else {
       fail(res)({
-        error: true,
-        message: 'Los datos de usuario ingresados son incorrectos.'
+        message: 'Los datos ingresados son incorrectos.'
       })
     }
   } catch (error) {
     console.log('error', error)
     fail(res)({
-      error: true,
       message: 'Ocurrio un problema, intenta nuevamente.'
     })
   }
