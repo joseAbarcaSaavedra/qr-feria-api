@@ -23,14 +23,15 @@ export const signJWT = async data => {
   const privateKey = process.env.KEYS
     ? process.env.KEYS.private
     : fs.readFileSync(authKey.private)
-  // console.log('privateKey', privateKey)
-  console.log(
+  console.log('process.env.KEYS', process.env.KEYS)
+  console.log('privateKey', privateKey)
+  /* console.log(
     'KEYS',
     JSON.stringify({
       private: authKey.privateVal,
       public: authKey.publicVal
     }).replace(/ /g, '')
-  )
+  ) */
   return new Promise((resolve, reject) => {
     jwt.sign(
       data,
