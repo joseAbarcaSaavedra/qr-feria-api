@@ -21,7 +21,7 @@ export const typeCheck = username => {
 
 export const signJWT = async data => {
   const privateKey = process.env.KEYS
-    ? process.env.KEYS.private
+    ? JSON.parse(process.env.KEYS).private
     : fs.readFileSync(authKey.private)
   console.log('process.env.KEYS', process.env.KEYS)
   console.log('privateKey', privateKey)
