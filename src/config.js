@@ -18,7 +18,7 @@ if (process.env.NODE_ENV !== 'production') {
     sample: path.join(__dirname, '../.env.example')
   })
 }
-
+console.log('process.env.NODE_ENV', process.env.NODE_ENV)
 const config = {
   all: {
     env: process.env.NODE_ENV || 'development',
@@ -26,7 +26,7 @@ const config = {
     port: process.env.PORT || 9000,
     ip: process.env.IP || '0.0.0.0',
     apiRoot: process.env.API_ROOT || '',
-    masterKey: requireProcessEnv('MASTER_KEY'),
+    masterKey: requireProcessEnv(process.env.NODE_ENV),
     domain: 857,
     ws: {
       service: {
