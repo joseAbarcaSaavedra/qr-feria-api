@@ -20,15 +20,17 @@ export const typeCheck = username => {
 }
 
 export const signJWT = async data => {
-  const privateKey = process.env.PRIVATE_KEY || fs.readFileSync(authKey.private)
-  console.log('privateKey', privateKey)
-  /* console.log(
+  const privateKey = process.env.KEYS
+    ? process.env.KEYS.private
+    : fs.readFileSync(authKey.private)
+  // console.log('privateKey', privateKey)
+  console.log(
     'KEYS',
     JSON.stringify({
       private: authKey.privateVal,
       public: authKey.publicVal
     }).replace(/ /g, '')
-  ) */
+  )
   return new Promise((resolve, reject) => {
     jwt.sign(
       data,
@@ -46,7 +48,9 @@ export const signJWT = async data => {
 }
 
 export const verifyJWT = async token => {
-  const publicKey = process.env.PUBLIC_KEY || fs.readFileSync(authKey.public)
+  const publicKey = process.env.KEYS
+    ? process.env.KEYS.public
+    : fs.readFileSync(authKey.public)
   console.log('publicKey', publicKey)
   return new Promise((resolve, reject) => {
     jwt.verify(token, publicKey, { algorithm: 'HS256' }, (err, token) => {
