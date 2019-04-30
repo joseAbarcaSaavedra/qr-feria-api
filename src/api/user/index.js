@@ -6,7 +6,7 @@ import { schema } from './model'
 export User, { schema } from './model'
 
 const router = new Router()
-const { name, role, createdAt, lastLogin } = schema.tree
+const { name, role, email, createdAt, password } = schema.tree
 
 /**
  * @api {post} /users Create user
@@ -15,12 +15,11 @@ const { name, role, createdAt, lastLogin } = schema.tree
  * @apiParam name User's name.
  * @apiParam role User's role.
  * @apiParam createdAt User's createdAt.
- * @apiParam lastLogin User's lastLogin.
  * @apiSuccess {Object} user User's data.
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 User not found.
  */
-router.post('/', body({ name, role, createdAt, lastLogin }), create)
+router.post('/', body({ name, role, email, password }), create)
 
 // Auth
 router.post(
@@ -31,6 +30,10 @@ router.post(
       required: true
     },
     password: {
+      type: 'string',
+      required: true
+    },
+    role: {
       type: 'string',
       required: true
     }
@@ -71,7 +74,7 @@ router.get('/:id', show)
  * @apiError {Object} 400 Some parameters may contain invalid values.
  * @apiError 404 User not found.
  */
-router.put('/:id', body({ name, role, createdAt, lastLogin }), update)
+router.put('/:id', body({ name, role, createdAt }), update)
 
 /**
  * @api {delete} /users/:id Delete user

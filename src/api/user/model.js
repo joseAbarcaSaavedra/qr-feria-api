@@ -1,57 +1,53 @@
 import mongoose, { Schema } from 'mongoose'
 
-const userSchema = new Schema(
-  {
-    name: {
-      type: String
-    },
-    role: {
-      type: String
-    },
-    createdAt: {
-      type: String
-    },
-    lastLogin: {
-      type: String
-    }
+const userSchema = new Schema({
+  name: {
+    type: String,
+    required: true
   },
-  {
-    timestamps: true,
-    toJSON: {
-      virtuals: true,
-      transform: (obj, ret) => {
-        delete ret._id
-      }
-    }
+  lastName: {
+    type: String
+  },
+  maidenName: {
+    type: String
+  },
+  picture: {
+    type: String
+  },
+  birthDate: {
+    type: Date
+  },
+  communityId: {
+    type: Number
+  },
+  gpsId: {
+    type: Number
+  },
+  role: {
+    type: String,
+    enum: ['applicant', 'officer', 'company', 'backoffice'],
+    index: true,
+    required: true
+  },
+  email: {
+    type: String,
+    index: true,
+    required: true
+  },
+  password: {
+    type: String
+  },
+  createdAt: {
+    type: Date,
+    default: new Date()
+  },
+  backoffice: {
+    type: Schema.Types.ObjectId,
+    ref: 'User'
   }
-)
-
-userSchema.methods = {
-  view(full) {
-    const view = {
-      // simple view
-      id: this.id,
-      name: this.name,
-      role: this.role,
-      createdAt: this.createdAt,
-      lastLogin: this.lastLogin,
-      updatedAt: this.updatedAt
-    }
-
-    return full
-      ? {
-          ...view
-          // add properties for a full view
-        }
-      : view
-  }
-}
+})
 
 const model = mongoose.model('User', userSchema)
 
 export const schema = model.schema
 export default model
-
-export const getUserByEmail = email => {
-  mysql.query()
-}

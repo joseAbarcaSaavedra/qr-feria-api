@@ -18,7 +18,7 @@ if (process.env.NODE_ENV !== 'production') {
     sample: path.join(__dirname, '../.env.example')
   })
 }
-console.log('process.env.NODE_ENV', process.env.NODE_ENV)
+
 const config = {
   all: {
     env: process.env.NODE_ENV || 'development',
@@ -26,7 +26,7 @@ const config = {
     port: process.env.PORT || 9000,
     ip: process.env.IP || '0.0.0.0',
     apiRoot: process.env.API_ROOT || '',
-    masterKey: requireProcessEnv('NODE_ENV'),
+    masterKey: requireProcessEnv('MASTER_KEY'),
     domain: 857,
     ws: {
       service: {
@@ -84,15 +84,15 @@ const config = {
       `,
       public: 'rsa_public.pem',
       publicVal: `-----BEGIN PUBLIC KEY-----
-      MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAx453H6pKA7r0Vi7oveve
-      BPVKCik+NeLcHvJxT+A3tyRMahdzvaqRC95FP4B+F+D0B8qnqzYco8O8xyjE1WrX
-      fVrs1VTv661vshS7wm1zBbmn1q59585Z2bpNJVI+g9LeATEaEt89KN35dPOdjIn+
-      cA3eBZovWb2sxuvGJGLhQGIMjV4/28hKXKeXGLoizox0JaOKNEsCBszMY7nDUwE+
-      bylpOzonjX5Ew9FHZUCSh41fgnY9fxJP6bXW7rYZLFccluB7N46IX+eC9kQdgQU8
-      Q79uc0LcbkwDeks9EK20E/UnVxwZfTsWJSoYLkzkrky6zZ3ZoUZdlA7XuOWrDQP4
-      hQIDAQAB
-      -----END PUBLIC KEY-----
-      `,
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAx453H6pKA7r0Vi7oveve
+BPVKCik+NeLcHvJxT+A3tyRMahdzvaqRC95FP4B+F+D0B8qnqzYco8O8xyjE1WrX
+fVrs1VTv661vshS7wm1zBbmn1q59585Z2bpNJVI+g9LeATEaEt89KN35dPOdjIn+
+cA3eBZovWb2sxuvGJGLhQGIMjV4/28hKXKeXGLoizox0JaOKNEsCBszMY7nDUwE+
+bylpOzonjX5Ew9FHZUCSh41fgnY9fxJP6bXW7rYZLFccluB7N46IX+eC9kQdgQU8
+Q79uc0LcbkwDeks9EK20E/UnVxwZfTsWJSoYLkzkrky6zZ3ZoUZdlA7XuOWrDQP4
+hQIDAQAB
+-----END PUBLIC KEY-----
+`,
       expirationTime: '12h'
     },
     mongo: {
@@ -106,7 +106,7 @@ const config = {
   test: {},
   development: {
     mongo: {
-      uri: 'mongodb://api%3Aapi.%2C123@ds163254.mlab.com:63254/heroku_8866j0tc',
+      uri: 'mongodb://api:api123@ds163254.mlab.com:63254/heroku_8866j0tc',
       options: {
         debug: true
       }
@@ -118,7 +118,7 @@ const config = {
     mongo: {
       uri:
         process.env.MONGODB_URI ||
-        'mongodb://api%3Aapi.%2C123@ds163254.mlab.com:63254/heroku_8866j0tc'
+        'mongodb://api:api123@ds163254.mlab.com:63254/heroku_8866j0tc'
     }
   }
 }

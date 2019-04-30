@@ -1,6 +1,12 @@
 import { success, notFound, fail } from '../../services/response/'
 import { User } from '.'
-import { typeCheck, signJWT, verifyJWT } from '../../services/auth/index'
+import {
+  typeCheck,
+  signJWT,
+  checkPassword,
+  tbjCrypt,
+  tbjDecrypt
+} from '../../services/auth/index'
 import { domain, ws } from '../../config'
 import _merge from 'lodash/merge'
 import _get from 'lodash/get'
@@ -12,7 +18,7 @@ const queryString = require('query-string')
 
 export const create = ({ bodymen: { body } }, res, next) =>
   User.create(body)
-    .then(user => user.view(true))
+    .then(user => user)
     .then(success(res, 201))
     .catch(next)
 
@@ -49,7 +55,8 @@ export const destroy = ({ params }, res, next) =>
     .then(success(res, 204))
     .catch(next)
 
-export const auth = async (req, res) => {
+// Auth Applicant User
+const authApplicant = async (req, res) => {
   try {
     const authParams = {
       userName: req.body.email,
@@ -102,19 +109,19 @@ export const auth = async (req, res) => {
             ''
           ),
           role: 'applicant',
-          cvUrl: 'http://google.cl'
+          cvUrl: `https://www.trabajando.cl/cvcandidato/${tbjCrypt(
+            applicantId
+          )}`
         }
-        // console.log('cvResponse', cvResponse)
-        // const applicantId = base64.decode(data.applicantId)
         // New Session
         const token = await signJWT(data)
-
-        /* const d = await verifyJWT(token)
-        console.log('verify: ', d) */
+        console.log('BASE64', base64.encode('118838'))
         success(res)({
           jwt: token,
-          // userData: cvResponse.data,
-          user: data.user
+          user: data.user,
+          applicantId: applicantId,
+          tbjCrypt: tbjCrypt('118838'),
+          tbjDecrypt: tbjDecrypt('o75mpYntSA93UTO0CNk1ONPiINKhKrM9UkNVrVY-YE8')
         })
       } catch (error) {
         console.log('error', error)
@@ -132,6 +139,74 @@ export const auth = async (req, res) => {
     fail(res)({
       message: 'Ocurrio un problema, intenta nuevamente.'
     })
+  }
+}
+
+const authCompany = async (req, res) => {
+  try {
+    success(res)({
+      jwt: 'el-token-challa',
+      user: { name: 'Empresa X' }
+    })
+  } catch (error) {
+    console.log('error', error)
+    fail(res)({
+      message: 'Ocurrio un problema, intenta nuevamente.'
+    })
+  }
+}
+
+const authOfficer = async (req, res) => {
+  try {
+    const { email, role } = req.body
+    const officer = await User.findOne(
+      {
+        email,
+        role
+      },
+      { email: 1, name: 1, role: 1, password: 1 }
+    )
+
+    if (officer && checkPassword(officer, req.body.password)) {
+      success(res)({
+        jwt: 'el-token-challa',
+        user: officer
+      })
+    } else {
+      fail(res)({
+        message: 'Datos de usuario incorrectos, intente nuevamente.'
+      })
+    }
+
+    /* .catch(error => {
+        console.log('error', error)
+        fail(res)({
+          message: error
+        })
+      }) */
+  } catch (error) {
+    console.log('error', error)
+    fail(res)({
+      message: 'Ocurrio un problema, intenta nuevamente.'
+    })
+  }
+}
+
+export const auth = async (req, res) => {
+  switch (req.body.role) {
+    case 'applicant':
+      await authApplicant(req, res)
+      break
+    case 'company':
+      await authCompany(req, res)
+      break
+    case 'officer':
+    case 'backoffice':
+      await authOfficer(req, res)
+      break
+    default:
+      res.json({ message: 'Rol es requerido' })
+      break
   }
 }
 
