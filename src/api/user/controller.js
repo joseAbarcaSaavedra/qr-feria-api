@@ -177,13 +177,6 @@ const authOfficer = async (req, res) => {
         message: 'Datos de usuario incorrectos, intente nuevamente.'
       })
     }
-
-    /* .catch(error => {
-        console.log('error', error)
-        fail(res)({
-          message: error
-        })
-      }) */
   } catch (error) {
     console.log('error', error)
     fail(res)({
