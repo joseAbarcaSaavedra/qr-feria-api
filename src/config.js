@@ -47,6 +47,16 @@ const config = {
             client: 'portalmobile',
             token: 'b3b6b7e1c8bdb60a7e924c62d3cb4b3b'
           }
+        },
+        nppToken: {
+          url: 'https://www.trabajando.cl',
+          path: '/rest/token/get/',
+          params: {
+            domain: 857,
+            country: 'cl',
+            client: 'PortalPersonas',
+            token: 'PortalPersonas'
+          }
         }
       }
     },

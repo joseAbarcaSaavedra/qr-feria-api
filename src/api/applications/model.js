@@ -1,10 +1,24 @@
 import mongoose, { Schema } from 'mongoose'
-
+/**
+ * No necesariamente los applicant  ingresados acá corresponden a applicants que iniciaron sesión,
+ * ya que tambien pueden llegar con el código QR del CV por lo que no tendran un user en Mongo
+ */
 const applicationsSchema = new Schema({
   applicant: {
-    type: Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
+    gpsId: {
+      type: Number
+    },
+    comunityId: {
+      type: Number
+    },
+    email: {
+      type: String,
+      required: true
+    },
+    cvUrl: {
+      type: String,
+      required: true
+    }
   },
   event: {
     type: Schema.Types.ObjectId,
