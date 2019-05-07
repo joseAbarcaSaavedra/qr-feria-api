@@ -6,9 +6,13 @@ import { create, index, show } from './controller'
 import { schema } from './model'
 
 const router = new Router()
-const { name, address, dateFrom, dateTo, active } = schema.tree
+const { name, address, dateFrom, dateTo, active, domain } = schema.tree
 
-router.post('/', body({ name, address, dateFrom, dateTo, active }), create)
+router.post(
+  '/',
+  body({ name, address, dateFrom, dateTo, active, domain }),
+  create
+)
 /**
  * @api {get} /users Retrieve users
  * @apiName RetrieveUsers
