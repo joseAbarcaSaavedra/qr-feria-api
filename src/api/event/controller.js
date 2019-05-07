@@ -1,5 +1,5 @@
 import Event from './model'
-import { success } from '../../services/response/'
+import { success, notFound } from '../../services/response/'
 
 export const create = async ({ bodymen: { body } }, res, next) => {
   const data = body
@@ -10,6 +10,39 @@ export const create = async ({ bodymen: { body } }, res, next) => {
     .then(success(res, 201))
     .catch(next)
 }
+
+export const index = ({ querymen: { query, select, cursor } }, res, next) =>
+  Event.count(query)
+    .then(count =>
+      Event.find(query, select, cursor).then(users => ({
+        count,
+        rows: users.map(user => user.view())
+      }))
+    )
+    .then(success(res))
+    .catch(next)
+
+export const show = ({ params }, res, next) =>
+  Event.findById(params.id)
+    .then(notFound(res))
+    .then(user => (user ? user.view() : null))
+    .then(success(res))
+    .catch(next)
+
+export const update = ({ bodymen: { body }, params }, res, next) =>
+  Event.findById(params.id)
+    .then(notFound(res))
+    .then(user => (user ? Object.assign(user, body).save() : null))
+    .then(user => (user ? user.view(true) : null))
+    .then(success(res))
+    .catch(next)
+
+export const destroy = ({ params }, res, next) =>
+  Event.findById(params.id)
+    .then(notFound(res))
+    .then(user => (user ? user.remove() : null))
+    .then(success(res, 204))
+    .catch(next)
 
 export const current = async () => {
   try {
