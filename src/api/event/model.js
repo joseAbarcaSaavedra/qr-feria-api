@@ -6,20 +6,16 @@ const eventSchema = new Schema({
     required: true,
     lowerCase: true
   },
+  address: {
+    type: String,
+    required: true,
+    lowerCase: true
+  },
   dateFrom: {
     type: Date
   },
   dateTo: {
     type: Date
-  },
-  offerId: {
-    type: Number,
-    required: true,
-    unique: true
-  },
-  domainId: {
-    type: Number,
-    required: true
   },
   domain: {
     type: String,

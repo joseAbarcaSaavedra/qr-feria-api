@@ -6,20 +6,8 @@ import { create } from './controller'
 import { schema } from './model'
 
 const router = new Router()
-const {
-  name,
-  dateFrom,
-  dateTo,
-  offerId,
-  domainId,
-  domain,
-  active
-} = schema.tree
+const { name, address, dateFrom, dateTo, active } = schema.tree
 
-router.post(
-  '/',
-  body({ name, dateFrom, dateTo, offerId, domainId, domain, active }),
-  create
-)
+router.post('/', body({ name, address, dateFrom, dateTo, active }), create)
 
 export default router

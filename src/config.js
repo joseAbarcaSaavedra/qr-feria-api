@@ -79,7 +79,10 @@ const config = {
     mongo: {
       uri: 'mongodb://api:api123@ds163254.mlab.com:63254/heroku_8866j0tc',
       options: {
-        debug: true
+        debug: true,
+        user: process.env.DB_MONGO_USER || '',
+        pass: process.env.DB_MONGO_PASSWORD || '',
+        useNewUrlParser: true
       }
     }
   },
