@@ -2,10 +2,11 @@ import Promise from 'bluebird'
 import mongoose from 'mongoose'
 import { mongo } from '../../config'
 
-Object.keys(mongo.options).forEach(key => {
+/* Object.keys(mongo.options).forEach(key => {
   mongoose.set(key, mongo.options[key])
-})
-console.log('mongo.options', mongo)
+}) */
+mongoose.Promise = Promise
+mongoose.createConnection(mongo.uri, mongo.options)
 // mongoose.Promise = Promise
 /* istanbul ignore next */
 /* mongoose.Types.ObjectId.prototype.view = function () {

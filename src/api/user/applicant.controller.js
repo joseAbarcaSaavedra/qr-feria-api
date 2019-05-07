@@ -1,5 +1,6 @@
 import { success, fail } from '../../services/response/'
 import User from './model'
+import { create as saveSession } from './../session/controller'
 import { signJWT, typeCheck, tbjCrypt } from '../../services/auth/index'
 import { domain, ws } from '../../config'
 import _merge from 'lodash/merge'
@@ -35,6 +36,7 @@ export const authApplicant = async (req, res) => {
       const { data } = response
       const applicantId = base64.decode(data.applicantId)
       const applicantCrypt = await tbjCrypt(applicantId)
+
       // Get CV
       try {
         const cvRequest = await fetch(
@@ -47,7 +49,9 @@ export const authApplicant = async (req, res) => {
           }
         )
         const cvResponse = await cvRequest.json()
+
         data.user = {
+          id: applicantId,
           firstName: _get(cvResponse, 'data.personalInfo.firstName', ''),
           middleName: _get(cvResponse, 'data.personalInfo.middleName', ''),
           lastName: _get(cvResponse, 'data.personalInfo.lastName', ''),
@@ -66,15 +70,43 @@ export const authApplicant = async (req, res) => {
         }
 
         data.event = req.event
-        // New Session
-        const token = await signJWT(data)
-        success(res)({
-          jwt: token,
-          user: data.user,
-          event: {
-            name: req.event.name
+
+        // Update User Data
+        const user = await updateUser(data)
+
+        if (user && user._id) {
+          // New Session
+          const sessionData = {
+            user: data.user,
+            event: data.event
           }
-        })
+
+          // Create JWT
+          const token = await signJWT(sessionData)
+
+          // Save session backup on DB
+          await saveSession({
+            user: user._id,
+            event: data.event._id,
+            jwt: token
+          })
+
+          // Remove data to the frontend response
+          delete sessionData.user.id
+
+          success(res)({
+            jwt: token,
+            user: sessionData.user,
+            event: {
+              name: sessionData.event.name
+            }
+          })
+        } else {
+          // Problems on save user data
+          fail(res)({
+            message: 'Ocurrio un problema, intenta nuevamente. (-2)'
+          })
+        }
       } catch (error) {
         console.log('error', error)
         fail(res)({
@@ -91,5 +123,30 @@ export const authApplicant = async (req, res) => {
     fail(res)({
       message: 'Ocurrio un problema, intenta nuevamente.'
     })
+  }
+}
+
+const updateUser = async data => {
+  try {
+    // console.log('data', data)
+    const result = await User.findOneAndUpdate(
+      { communityId: data.user.id, role: 'applicant' },
+      {
+        name: `${data.user.firstName} ${data.user.middleName}`,
+        lastName: data.user.lastName,
+        maidenName: data.user.maidenName,
+        email: data.user.email,
+        picture: data.user.picture,
+        role: 'applicant',
+        communityId: data.user.id
+      },
+      {
+        upsert: true
+      }
+    )
+    return result
+  } catch (error) {
+    console.log('error [updateUser]!', error)
+    return null
   }
 }

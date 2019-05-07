@@ -14,9 +14,6 @@ const userSchema = new Schema({
   picture: {
     type: String
   },
-  birthDate: {
-    type: Date
-  },
   communityId: {
     type: Number
   },
@@ -40,10 +37,6 @@ const userSchema = new Schema({
   createdAt: {
     type: Date,
     default: new Date()
-  },
-  backoffice: {
-    type: Schema.Types.ObjectId,
-    ref: 'User'
   }
 })
 

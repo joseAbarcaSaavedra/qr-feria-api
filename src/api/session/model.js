@@ -12,8 +12,7 @@ const sessionSchema = new Schema({
     required: true
   },
   jwt: {
-    type: String,
-    unique: true
+    type: String
   },
   createdAt: {
     type: Date,

@@ -89,12 +89,14 @@ const config = {
     mongo: {
       uri:
         process.env.MONGODB_URI ||
-        `mongodb://${process.env.DB_MONGO_USER}:${
-          process.env.DB_MONGO_PASSWORD
-        }@${process.env.DB_MONGO_HOST_PRIMARY}:${process.env.DB_MONGO_PORT}/${
-          process.env.DB_MONGO_DATABASE
-        }?authMechanism=MONGODB-CR`,
-      useNewUrlParser: true
+        `mongodb://${process.env.DB_MONGO_HOST_PRIMARY}:${
+          process.env.DB_MONGO_PORT
+        }/${process.env.DB_MONGO_DATABASE}`,
+      options: {
+        user: process.env.DB_MONGO_USER,
+        pass: process.env.DB_MONGO_PASSWORD,
+        useNewUrlParser: true
+      }
     }
   }
 }
