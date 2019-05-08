@@ -49,7 +49,7 @@ const config = {
           }
         },
         nppToken: {
-          url: process.env.URL_SOA_CL || 'https://www.trabajando.cl',
+          url: 'https://www.trabajando.cl',
           path: '/rest/token/get/',
           params: {
             domain: 857,

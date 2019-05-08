@@ -117,15 +117,13 @@ export const authApplicant = async (req, res) => {
 
 export const getCv = async applicantId => {
   try {
-    const cvRequest = await fetch(
-      `${ws.service.cv.url}${
-        ws.service.cv.path
-      }${applicantId}?${queryString.stringify(ws.service.cv.params)}`,
-      {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-      }
-    )
+    const url = `${ws.service.cv.url}${
+      ws.service.cv.path
+    }${applicantId}?${queryString.stringify(ws.service.cv.params)}`
+    const cvRequest = await fetch(url, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    })
     const cvResponse = await cvRequest.json()
     return cvResponse
   } catch (error) {
