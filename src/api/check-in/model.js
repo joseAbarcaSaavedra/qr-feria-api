@@ -9,13 +9,13 @@ const checkInSchema = new Schema({
       type: Number
     },
     comunityId: {
-      type: Number
-    },
-    email: {
-      type: String,
+      type: Number,
       required: true
     },
-    cvUrl: {
+    email: {
+      type: String
+    },
+    nppToken: {
       type: String,
       required: true
     }

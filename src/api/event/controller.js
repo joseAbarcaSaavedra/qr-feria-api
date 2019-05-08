@@ -1,5 +1,5 @@
 import Event from './model'
-import { success, notFound } from '../../services/response/'
+import { success, notFound, fail } from '../../services/response/'
 
 export const create = async ({ bodymen: { body } }, res, next) => {
   const data = body
@@ -8,7 +8,10 @@ export const create = async ({ bodymen: { body } }, res, next) => {
   Event.create(data)
     .then(event => event)
     .then(success(res, 201))
-    .catch(next)
+    .catch(error => {
+      console.log('ERROR!', error)
+      fail(res)({ error: JSON.stringify(error) })
+    })
 }
 
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>

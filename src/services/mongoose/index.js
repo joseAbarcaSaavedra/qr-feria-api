@@ -6,7 +6,7 @@ import { mongo } from '../../config'
   mongoose.set(key, mongo.options[key])
 }) */
 mongoose.Promise = Promise
-mongoose.createConnection(mongo.uri, mongo.options)
+mongoose.createConnection(mongo.uri)
 // mongoose.Promise = Promise
 /* istanbul ignore next */
 /* mongoose.Types.ObjectId.prototype.view = function () {

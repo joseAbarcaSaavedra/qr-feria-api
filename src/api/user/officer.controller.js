@@ -24,6 +24,8 @@ export const authOfficer = async (req, res) => {
         },
         event: req.event
       }
+
+      console.log('data', data)
       const token = await signJWT(data)
 
       success(res)({

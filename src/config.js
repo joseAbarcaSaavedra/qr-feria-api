@@ -92,9 +92,11 @@ const config = {
     mongo: {
       uri:
         process.env.MONGODB_URI ||
-        `mongodb://${process.env.DB_MONGO_HOST_PRIMARY}:${
-          process.env.DB_MONGO_PORT
-        }/${process.env.DB_MONGO_DATABASE}`,
+        `mongodb://${process.env.DB_MONGO_USER}:${
+          process.env.DB_MONGO_PASSWORD
+        }@${process.env.DB_MONGO_HOST_PRIMARY}:${process.env.DB_MONGO_PORT}/${
+          process.env.DB_MONGO_DATABASE
+        }?authMechanism=SCRAM-SHA-1&useNewUrlParser=true`,
       options: {
         user: process.env.DB_MONGO_USER,
         pass: process.env.DB_MONGO_PASSWORD,

@@ -36,20 +36,9 @@ export const authApplicant = async (req, res) => {
       const { data } = response
       const applicantId = base64.decode(data.applicantId)
       const applicantCrypt = await tbjCrypt(applicantId)
-
+      const cvResponse = await getCv(applicantId)
       // Get CV
       try {
-        const cvRequest = await fetch(
-          `${ws.service.cv.url}${
-            ws.service.cv.path
-          }${applicantId}?${queryString.stringify(ws.service.cv.params)}`,
-          {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' }
-          }
-        )
-        const cvResponse = await cvRequest.json()
-
         data.user = {
           id: applicantId,
           firstName: _get(cvResponse, 'data.personalInfo.firstName', ''),
@@ -123,6 +112,24 @@ export const authApplicant = async (req, res) => {
     fail(res)({
       message: 'Ocurrio un problema, intenta nuevamente.'
     })
+  }
+}
+
+export const getCv = async applicantId => {
+  try {
+    const cvRequest = await fetch(
+      `${ws.service.cv.url}${
+        ws.service.cv.path
+      }${applicantId}?${queryString.stringify(ws.service.cv.params)}`,
+      {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      }
+    )
+    const cvResponse = await cvRequest.json()
+    return cvResponse
+  } catch (error) {
+    return null
   }
 }
 
