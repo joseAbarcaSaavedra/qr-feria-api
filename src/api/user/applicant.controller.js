@@ -35,34 +35,17 @@ export const authApplicant = async (req, res) => {
     if (response.status === 'OK') {
       const { data } = response
       const applicantId = base64.decode(data.applicantId)
-      const applicantCrypt = await tbjCrypt(applicantId)
+
       const cvResponse = await getCv(applicantId)
+      cvResponse.applicantCrypt = await tbjCrypt(applicantId)
       // Get CV
       try {
-        data.user = {
-          id: applicantId,
-          firstName: _get(cvResponse, 'data.personalInfo.firstName', ''),
-          middleName: _get(cvResponse, 'data.personalInfo.middleName', ''),
-          lastName: _get(cvResponse, 'data.personalInfo.lastName', ''),
-          maidenName: _get(cvResponse, 'data.personalInfo.maidenName', ''),
-          email: _get(cvResponse, 'data.personalInfo.emails.primaryEmail', ''),
-          picture: _get(cvResponse, 'data.personalInfo.picture', ''),
-          phone: _get(
-            _get(cvResponse, 'data.personalInfo.phoneNumbers', []).filter(
-              phone => phone.place === 'mobile'
-            ),
-            '[0].number',
-            ''
-          ),
-          role: 'applicant',
-          cvUrl: `https://www.trabajando.cl/cvcandidato/${applicantCrypt}`
-        }
-
+        cvResponse.applicantId = applicantId
+        data.user = parseApplicantData(cvResponse)
         data.event = req.event
 
         // Update User Data
-        const user = await updateUser(data)
-
+        const user = await updateUser(data.user)
         if (user && user._id) {
           // New Session
           const sessionData = {
@@ -131,22 +114,48 @@ export const getCv = async applicantId => {
   }
 }
 
-const updateUser = async data => {
+export const parseApplicantData = data => {
+  return {
+    id: data.applicantId,
+    firstName: _get(data, 'data.personalInfo.firstName', ''),
+    middleName: _get(data, 'data.personalInfo.middleName', ''),
+    lastName: _get(data, 'data.personalInfo.lastName', ''),
+    maidenName: _get(data, 'data.personalInfo.maidenName', ''),
+    email: _get(data, 'data.personalInfo.emails.primaryEmail', ''),
+    picture: _get(data, 'data.personalInfo.picture', ''),
+    phone: _get(
+      _get(data, 'data.personalInfo.phoneNumbers', []).filter(
+        phone => phone.place === 'mobile'
+      ),
+      '[0].number',
+      ''
+    ),
+    role: 'applicant',
+    cvUrl: `https://www.trabajando.cl/cvcandidato/${data.applicantCrypt}`,
+    nppToken: data.applicantCrypt
+  }
+}
+
+export const updateUser = async data => {
   try {
     // console.log('data', data)
     const result = await User.findOneAndUpdate(
-      { communityId: data.user.id, role: 'applicant' },
+      { communityId: data.id, role: 'applicant' },
       {
-        name: `${data.user.firstName} ${data.user.middleName}`,
-        lastName: data.user.lastName,
-        maidenName: data.user.maidenName,
-        email: data.user.email,
-        picture: data.user.picture,
+        name: `${data.firstName} ${data.middleName}`,
+        lastName: data.lastName,
+        maidenName: data.maidenName,
+        email: data.email,
+        phone: data.phone,
+        picture: data.picture,
+        cvUrl: data.cvUrl,
+        nppToken: data.nppToken,
         role: 'applicant',
-        communityId: data.user.id
+        communityId: data.id
       },
       {
-        upsert: true
+        upsert: true,
+        new: true
       }
     )
     return result

@@ -57,6 +57,11 @@ const config = {
             client: 'PortalPersonas',
             token: 'PortalPersonas'
           }
+        },
+        gpsAuth: {
+          url: process.env.URL_WSGPS_CL || 'http://localhost:8080',
+          path: '/WSGPS/jaxrs/userws/logInExternal',
+          headers: {}
         }
       }
     },

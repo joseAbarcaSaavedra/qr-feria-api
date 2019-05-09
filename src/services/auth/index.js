@@ -106,6 +106,10 @@ export const tbjDecrypt = async str => {
   }
 }
 
+export const cryptGps = async str => {
+  return 'ola-ke-ase'
+}
+
 export const checkPassword = (user, password) => {
   try {
     return base64.encode(user.password) === base64.encode(password)

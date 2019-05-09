@@ -7,6 +7,7 @@ export const currentEvent = async (req, res, next) => {
     const event = await current()
     if (event) {
       req.event = event
+      req.event.folder = req.event.name.replace(' ', '_').toUpperCase()
       next()
     } else {
       fail(res)({

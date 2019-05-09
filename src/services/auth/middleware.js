@@ -16,7 +16,8 @@ export const checkRole = (roles = []) => {
         res.status(401).json({ message: 'Unauthorized!' })
       }
     } catch (error) {
-      res.status(500).json({ message: 'Autorization token are required!' })
+      console.log('error', error)
+      res.status(401).json({ message: 'Autorization token are required!' })
     }
   }
 }

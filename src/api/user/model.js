@@ -14,6 +14,15 @@ const userSchema = new Schema({
   picture: {
     type: String
   },
+  phone: {
+    type: String
+  },
+  cvUrl: {
+    type: String
+  },
+  nppToken: {
+    type: String
+  },
   communityId: {
     type: Number
   },

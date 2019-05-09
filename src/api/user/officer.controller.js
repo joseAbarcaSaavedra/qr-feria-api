@@ -4,7 +4,6 @@ import { signJWT, checkPassword } from '../../services/auth/index'
 
 export const authOfficer = async (req, res) => {
   try {
-    console.log('req.event', req.event)
     const { email, role } = req.body
     const officer = await User.findOne(
       {
@@ -25,7 +24,6 @@ export const authOfficer = async (req, res) => {
         event: req.event
       }
 
-      console.log('data', data)
       const token = await signJWT(data)
 
       success(res)({
