@@ -1,15 +1,19 @@
 import { success, notFound, fail } from '../../services/response/'
-import { User } from './model'
+import User from './model'
 
 import { authOfficer } from './officer.controller'
 import { authCompany } from './company.controller'
 import { authApplicant } from './applicant.controller'
 
-export const create = ({ bodymen: { body } }, res, next) =>
-  User.create(body)
-    .then(user => user)
-    .then(success(res, 201))
-    .catch(next)
+export const create = async ({ bodymen: { body } }, res, next) => {
+  try {
+    const result = await User.create(body)
+    success(res, 201)(result)
+  } catch (error) {
+    console.log('Error', error)
+    fail(res)({ error: JSON.stringify(error) })
+  }
+}
 
 export const index = ({ querymen: { query, select, cursor } }, res, next) =>
   User.count(query)
