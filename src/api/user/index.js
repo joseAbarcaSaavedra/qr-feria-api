@@ -36,6 +36,9 @@ router.post(
     role: {
       type: 'string',
       required: true
+    },
+    company: {
+      type: 'number'
     }
   }),
   auth

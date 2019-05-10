@@ -4,6 +4,7 @@ const { validate } = require('rut.js')
 const jwt = require('jsonwebtoken')
 const fetch = require('node-fetch')
 const queryString = require('query-string')
+const sha1 = require('sha1')
 
 // const md5 = require('md5')
 const fs = require('fs')
@@ -107,7 +108,8 @@ export const tbjDecrypt = async str => {
 }
 
 export const cryptGps = async str => {
-  return 'ola-ke-ase'
+  console.log('str', str, '->', sha1(str))
+  return sha1(str)
 }
 
 export const checkPassword = (user, password) => {

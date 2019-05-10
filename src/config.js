@@ -59,7 +59,7 @@ const config = {
           }
         },
         gpsAuth: {
-          url: process.env.URL_WSGPS_CL || 'http://localhost:8080',
+          url: process.env.URL_WSGPS_CL || 'http://54.209.46.216:8080',
           path: '/WSGPS/jaxrs/userws/logInExternal',
           headers: {}
         }

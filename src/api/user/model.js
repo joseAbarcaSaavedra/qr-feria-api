@@ -20,6 +20,9 @@ const userSchema = new Schema({
   cvUrl: {
     type: String
   },
+  gpsToken: {
+    type: String
+  },
   nppToken: {
     type: String
   },
