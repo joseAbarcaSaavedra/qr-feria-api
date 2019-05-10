@@ -1,19 +1,20 @@
 import { success, fail } from '../../services/response/'
-import Folder from './models'
+import Folder from './model'
 const base64 = require('base-64')
-export const create = async (folderName, companyId, event) => {
+
+export const create = async (folderName, company, event) => {
   try {
     const name = folderName.toLowerCase()
-    const key = `${event}-${companyId}-${base64.encode(folderName)}`
+    const key = `${event}_${company}_${base64.encode(name)}`
     const result = await Folder.findOneAndUpdate(
       { key },
       {
         name,
         event,
-        companyId,
+        company,
         key
       },
-      { upsert: true }
+      { upsert: true, new: true }
     )
     return result
   } catch (error) {
@@ -27,10 +28,11 @@ export const list = async (req, res) => {
     const folders = await Folder.find(
       {
         event: req.session.event._id,
-        companyId: req.session.user.id
+        company: req.session.user.id
       },
-      { name: 1, _id: 1 }
+      { name: 1, _id: 0 }
     )
+
     success(res)({ folders })
   } catch (error) {
     fail(res)({ message: 'ocurrio un problema al obtener las carpetas' })

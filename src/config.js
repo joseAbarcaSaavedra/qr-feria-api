@@ -62,6 +62,11 @@ const config = {
           url: process.env.URL_WSGPS_CL || 'http://54.209.46.216:8080',
           path: '/WSGPS/jaxrs/userws/logInExternal',
           headers: {}
+        },
+        gpsStorage: {
+          url: process.env.URL_WSGPS_CL || 'http://54.209.46.216:8080',
+          path: '/WSGPS/jaxrs/storagews/add',
+          headers: {}
         }
       }
     },

@@ -91,7 +91,7 @@ export const authCompany = async (req, res) => {
     } catch (error) {
       console.log('error', error)
       fail(res)({
-        message: 'Problemas al obtener datos de la empresa (-1)'
+        message: 'Los datos ingresados son incorrectos.'
       })
     }
   } catch (error) {

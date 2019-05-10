@@ -24,25 +24,25 @@ router.post(
 
 router.get(
   '/count',
+  checkRole(['officer', 'company']),
   query({
     type: {
       type: String,
       required: true
     }
   }),
-  checkRole(['officer', 'company']),
   count
 )
 
 router.get(
   '/',
+  checkRole(['officer', 'company']),
   query({
     id: {
       type: String,
       required: true
     }
   }),
-  checkRole(['officer', 'company']),
   index
 )
 

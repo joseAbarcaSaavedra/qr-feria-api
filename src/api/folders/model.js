@@ -6,8 +6,9 @@ const folderSchema = new Schema({
     required: true,
     lowerCase: true
   },
-  companyId: {
-    type: String,
+  company: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
     required: true
   },
   event: {

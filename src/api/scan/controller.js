@@ -90,3 +90,16 @@ export const count = async (req, res) => {
     success(res)({ count: -1 })
   }
 }
+
+export const byId = async id => {
+  try {
+    return await Scan.findById(id).populate([
+      {
+        path: 'applicant'
+      }
+    ])
+  } catch (error) {
+    console.log('[scan.byId] error:', error)
+    return null
+  }
+}

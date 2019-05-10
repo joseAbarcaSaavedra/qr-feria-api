@@ -3,7 +3,9 @@ import { Router } from 'express'
 import test from './test'
 import user from './user'
 import event from './event'
+import folders from './folders'
 import scan from './scan'
+import application from './application'
 
 // import event from './event'
 import { currentEvent } from './event/middleware'
@@ -11,7 +13,9 @@ import { currentEvent } from './event/middleware'
 const router = new Router()
 router.use('/test', test)
 router.use('/events', event)
-router.use('/scan', scan)
+router.use('/folder', currentEvent, folders)
+router.use('/scan', currentEvent, scan)
+router.use('/application', currentEvent, application)
 router.use('/users', currentEvent, user)
 
 export default router
