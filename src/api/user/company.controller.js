@@ -15,7 +15,7 @@ export const authCompany = async (req, res) => {
     }
 
     if (req.body.company) authParams.company = { id: req.body.company }
-
+    console.log('authParams', authParams)
     try {
       // Auth
       const request = await fetch(
@@ -26,26 +26,46 @@ export const authCompany = async (req, res) => {
           headers: { 'Content-Type': 'application/json' }
         }
       )
+      const gpsResponse = await request.json()
+      console.log('gpsResponse', gpsResponse)
       const {
         data: { user }
-      } = await request.json()
+      } = gpsResponse
+
       // Check auth response
       // If user have multiple company access
+      // console.log('user', user)
       let companies =
-        user.companies && user.companies.length > 0 ? user.companies : []
+        user && user.companies && user.companies.length > 0
+          ? user.companies
+          : []
+      console.log('user !!!!!!!', user)
       companies = companies.map(company => {
         return { id: company.id, name: company.name }
       })
 
-      const userData = {
+      /*  const userData = {
         user: {
-          gpsId: user.company.id,
+          gpsId: companies.length > 0 ? companies[0].id : user.company.id,
           name: user.name,
           lastName: user.lastname,
           email: user.email,
           role: 'company',
           companies: companies,
           gpsToken: user.token
+        }
+      } */
+      // Fake login
+      const userData = {
+        user: {
+          gpsId: 366,
+          name: 'tro',
+          lastName: 'lazo',
+          email: 'tro@lazo.com',
+          role: 'company',
+          companies: [],
+          gpsToken:
+            'XStoAQqEIfwc+GVn7hXVuN31BxJpgCK5lOoAaWMDGhkdj04BkK30hRSyMXTaXq1ORWC2MtQ1A9Ida9F8rVEFx/5YlFB690dF6/Q/RGnevI0='
         }
       }
 
