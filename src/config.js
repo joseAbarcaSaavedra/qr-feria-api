@@ -48,6 +48,24 @@ const config = {
             token: 'b3b6b7e1c8bdb60a7e924c62d3cb4b3b'
           }
         },
+        checkCv: {
+          url: process.env.URL_SOA_CL || 'http://wsbcknd.trabajando.com',
+          path: '/v1.3.5-CL/rest/Applicants/json/check',
+          params: {
+            country: 'cl',
+            client: 'portalmobile',
+            token: 'b3b6b7e1c8bdb60a7e924c62d3cb4b3b'
+          }
+        },
+        addCv: {
+          url: process.env.URL_SOA_CL || 'http://wsbcknd.trabajando.com',
+          path: '/v1.3.5-CL/rest/Applicants/json/addCV',
+          params: {
+            country: 'cl',
+            client: 'portalmobile',
+            token: 'b3b6b7e1c8bdb60a7e924c62d3cb4b3b'
+          }
+        },
         nppToken: {
           url: 'https://www.trabajando.cl',
           path: '/rest/token/get/',
