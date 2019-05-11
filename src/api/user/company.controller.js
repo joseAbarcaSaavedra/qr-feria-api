@@ -44,7 +44,7 @@ export const authCompany = async (req, res) => {
         return { id: company.id, name: company.name }
       })
 
-      /*  const userData = {
+      const userData = {
         user: {
           gpsId: companies.length > 0 ? companies[0].id : user.company.id,
           name: user.name,
@@ -54,9 +54,9 @@ export const authCompany = async (req, res) => {
           companies: companies,
           gpsToken: user.token
         }
-      } */
+      }
       // Fake login
-      const userData = {
+      /* const userData = {
         user: {
           gpsId: 366,
           name: 'tro',
@@ -67,7 +67,7 @@ export const authCompany = async (req, res) => {
           gpsToken:
             'XStoAQqEIfwc+GVn7hXVuN31BxJpgCK5lOoAaWMDGhkdj04BkK30hRSyMXTaXq1ORWC2MtQ1A9Ida9F8rVEFx/5YlFB690dF6/Q/RGnevI0='
         }
-      }
+      } */
 
       userData.event = req.event
 
