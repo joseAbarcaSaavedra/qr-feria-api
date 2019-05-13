@@ -18,8 +18,7 @@ const applicationSchema = new Schema({
   },
   position: {
     type: Schema.Types.ObjectId,
-    ref: 'Position',
-    required: true
+    ref: 'Position'
   },
   comment: {
     type: String

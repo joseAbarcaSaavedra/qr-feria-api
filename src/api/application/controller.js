@@ -8,13 +8,16 @@ const fetch = require('node-fetch')
 export const create = async (req, res) => {
   try {
     // create company folder
-    const folder = await createFolder(
-      req.body.position,
-      req.session.user.id,
-      req.session.event._id
-    )
+    let folder = null
+    if (req.body.position.trim() !== '') {
+      folder = await createFolder(
+        req.body.position,
+        req.session.user.id,
+        req.session.event._id
+      )
+    }
 
-    if (folder && folder._id) {
+    if ((folder && folder._id) || req.body.position.trim() === '') {
       // Get scan data
       const scan = await scanById(req.body.scan)
 
@@ -23,7 +26,7 @@ export const create = async (req, res) => {
         const application = {
           directory: {
             parentKey: req.event.folder,
-            title: folder.name
+            title: folder ? folder.name : 'general'
           },
           applicants: [
             {
@@ -49,7 +52,7 @@ export const create = async (req, res) => {
             scan: scan._id,
             event: req.session.event._id,
             company: req.session.user.id,
-            position: folder._id,
+            position: folder ? folder._id : '',
             comment: req.body.comment || '',
             evaluation: req.body.evaluation || 0
           })

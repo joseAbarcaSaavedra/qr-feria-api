@@ -3,6 +3,7 @@ import User from './model'
 import { create as saveSession } from './../session/controller'
 import { domain, ws } from '../../config'
 import { cryptGps, signJWT } from '../../services/auth/index'
+import _compact from 'lodash/compact'
 
 const fetch = require('node-fetch')
 
@@ -29,29 +30,38 @@ export const authCompany = async (req, res) => {
       const gpsResponse = await request.json()
       console.log('gpsResponse', gpsResponse)
       const {
-        data: { user }
+        data: { user, companies }
       } = gpsResponse
 
       // Check auth response
       // If user have multiple company access
       // console.log('user', user)
-      let companies =
-        user && user.companies && user.companies.length > 0
-          ? user.companies
-          : []
-      console.log('user !!!!!!!', user)
-      companies = companies.map(company => {
-        return { id: company.id, name: company.name }
-      })
+      let arrCompanies = companies && companies.length > 1 ? companies : []
+
+      arrCompanies = _compact(
+        companies.map(company => {
+          return company && company.id
+            ? { id: company.id, name: company.name }
+            : null
+        })
+      )
 
       const userData = {
         user: {
-          gpsId: companies.length > 0 ? companies[0].id : user.company.id,
+          gpsId:
+            !req.body.company && arrCompanies.length > 1
+              ? arrCompanies[0].id
+              : req.body.company
+              ? req.body.company
+              : user.company.id,
           name: user.name,
           lastName: user.lastname,
           email: user.email,
           role: 'company',
-          companies: companies,
+          companies:
+            req.body.company || (companies && companies.length <= 1)
+              ? []
+              : companies,
           gpsToken: user.token
         }
       }
@@ -94,6 +104,10 @@ export const authCompany = async (req, res) => {
         delete sessionData.user.id
         delete sessionData.user.gpsId
         delete sessionData.user.gpsToken
+
+        /*  if (!req.body.company && arrCompanies && arrCompanies.length > 1) {
+          sessionData.user.companies = arrCompanies
+        } */
 
         success(res)({
           jwt: token,
