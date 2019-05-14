@@ -15,7 +15,7 @@ export const create = async (req, res) => {
       firstName: req.body.firstName,
       middleName: '',
       lastName: req.body.lastName,
-      maidenName: '',
+      maidenName: req.body.maidenName || '',
       sex: 0,
       email: req.body.email,
       backupEmail: req.body.email,
@@ -98,7 +98,7 @@ export const edit = async (req, res) => {
         firstName: req.body.firstName,
         mddleName: personalInfo.mddleName,
         lastName: req.body.lastName,
-        maidenName: personalInfo.maidenName,
+        maidenName: req.body.maidenName,
         cellNumber: req.body.phone,
         sex: personalInfo.gender.id,
         civilStatus: personalInfo.maritalStatus.id,
@@ -204,6 +204,7 @@ export const check = async (req, res) => {
         identification: identification,
         firstName: personalInfo.firstName,
         lastName: personalInfo.lastName,
+        maidenName: personalInfo.maidenName,
         email: personalInfo.emails ? personalInfo.emails.primaryEmail : '',
         phone: personalInfo.phoneNumbers
           ? personalInfo.phoneNumbers.find(phone => {
@@ -223,6 +224,7 @@ export const check = async (req, res) => {
         identification: req.body.identification,
         firstName: '',
         lastName: '',
+        maidenName: '',
         email: '',
         phone: '',
         nppToken: '',
