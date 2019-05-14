@@ -1,11 +1,14 @@
 import Applicant from './model'
-import { success, notFound, fail } from '../../services/response/'
+import { success, fail } from '../../services/response/'
 import { domain, ws } from '../../config'
-import { signJWT, typeCheck, tbjCrypt } from '../../services/auth/index'
+import { tbjCrypt } from '../../services/auth/index'
 import _merge from 'lodash/merge'
 import { getCv } from '../user/applicant.controller'
+import { bodyParser } from 'body-parser'
 const fetch = require('node-fetch')
-const { validate, clean, format } = require('rut.js')
+const moment = require('moment')
+const base64 = require('base-64')
+const { clean } = require('rut.js')
 export const create = async (req, res) => {
   try {
     const applicant = {
@@ -13,7 +16,7 @@ export const create = async (req, res) => {
       middleName: '',
       lastName: req.body.lastName,
       maidenName: '',
-      sex: 1,
+      sex: 0,
       email: req.body.email,
       backupEmail: req.body.email,
       password: req.body.password || req.body.lastName,
@@ -26,7 +29,7 @@ export const create = async (req, res) => {
       question: '¿dónde se registro como candidato?',
       answer: 'feria',
       status: 0,
-      joinDate: '20121203',
+      joinDate: moment().format('YYYYMMDD'),
       domainId: domain,
       dateOfBirth: '19000101',
       rut: req.body.identification,
@@ -54,15 +57,24 @@ export const create = async (req, res) => {
     req.body.cvUrl = `https://www.trabajando.cl/cvcandidato/${
       req.body.nppToken
     }`
-    // Save in mongo
 
-    // TODO: add id and nppToken to mongodb data
-
-    res.json({
+    success(res)({
       success: true,
       data: req.body /* ,
       createResult */
     })
+
+    // Async
+    const aData = req.body
+    aData.password = base64.encode(aData.password)
+    await updateInMongo(
+      {
+        ...aData,
+        event: req.session.event._id,
+        createdBy: req.session.user.id
+      },
+      req.session.event
+    )
   } catch (error) {
     console.log('error', error)
     fail(res)({
@@ -105,15 +117,43 @@ export const edit = async (req, res) => {
 
       const soaResult = await updateSOA(applicantData)
       const { status, data } = soaResult
-      if (status === 'OK' && data && data.success) {
+
+      let updatePassResult = true
+
+      if (req.body.password && req.body.password.trim() !== '') {
+        const {
+          data: { success }
+        } = await updatePassword(req.applicantId, req.body.password)
+        updatePassResult = success
+      }
+
+      if (status === 'OK' && data && data.success && updatePassResult) {
         req.body.nppToken = await tbjCrypt(req.applicantId)
         req.body.cvUrl = `https://www.trabajando.cl/cvcandidato/${
           req.body.nppToken
         }`
+
         success(res)({
           success: true,
-          data: req.body /* ,
-          createResult */
+          data: req.body
+        })
+        // Async
+        const aData = req.body
+        aData.password = base64.encode(aData.password)
+        await updateInMongo(
+          {
+            ...aData,
+            event: req.session.event._id,
+            updatedBy: req.session.user.id,
+            updatedAt: new Date()
+          },
+          req.session.event
+        )
+      } else if (!updatePassResult) {
+        fail(res)({
+          success: false,
+          message: 'Problema al actualizar la contraseña (-4)',
+          error: JSON.stringify(soaResult)
         })
       } else {
         fail(res)({
@@ -146,12 +186,10 @@ export const check = async (req, res) => {
       req.body.originCountryDoc === 1
         ? clean(req.body.identification)
         : req.body.identification
-    console.log('identification', identification)
     const checkResult = await checkSOA(
       identification,
       req.body.originCountryDoc
     )
-    console.log('checkResult', checkResult)
     const {
       data: { personalInfo }
     } = checkResult
@@ -194,6 +232,19 @@ export const check = async (req, res) => {
   }
 }
 
+export const count = async (req, res) => {
+  try {
+    const qry = {
+      event: req.session.event._id
+    }
+
+    const count = await Applicant.count(qry)
+    success(res)({ count })
+  } catch (error) {
+    success(res)({ count: -1 })
+  }
+}
+
 const checkSOA = async (identification, type = 1) => {
   try {
     const checkParams = {
@@ -201,7 +252,6 @@ const checkSOA = async (identification, type = 1) => {
       domainId: domain,
       typeCheck: type === 1 ? type : 6 // Passport
     }
-    console.log('checkParams', checkParams)
     const request = await fetch(
       `${ws.service.checkCv.url}${ws.service.checkCv.path}`,
       {
@@ -248,6 +298,47 @@ const updateSOA = async data => {
     )
     const response = await request.json()
     return response
+  } catch (error) {
+    return null
+  }
+}
+
+const updatePassword = async (applicantId, password) => {
+  try {
+    const data = _merge(
+      {
+        personId: parseInt(applicantId),
+        password: base64.encode(password)
+      },
+      ws.service.updatePassword.params
+    )
+    const request = await fetch(
+      `${ws.service.updatePassword.url}${ws.service.updatePassword.path}`,
+      {
+        method: 'PUT',
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' }
+      }
+    )
+    const response = await request.json()
+    return response
+  } catch (error) {
+    return { data: { success: false } }
+  }
+}
+
+const updateInMongo = async (data, event) => {
+  try {
+    const result = await Applicant.findOneAndUpdate(
+      { identification: data.identification, event: event.id },
+      data,
+      {
+        upsert: true,
+        new: true
+      }
+    )
+    console.log('RESULT CREATE IN MONGO', result)
+    return result
   } catch (error) {
     return null
   }

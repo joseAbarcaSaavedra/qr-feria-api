@@ -1,10 +1,12 @@
 import { Router } from 'express'
-import { create, check, edit } from './controller'
+import { create, check, edit, count } from './controller'
 import { parseNppToken } from './middleware'
 import { middleware as body } from 'bodymen'
 import { checkRole } from '../../services/auth/middleware'
 
 const router = new Router()
+
+router.get('/count', checkRole(['backoffice']), count)
 
 router.post(
   '/check',

@@ -10,7 +10,8 @@ router.post(
   body({
     position: {
       type: String,
-      required: true
+      required: false,
+      maxlength: 20
     },
     scan: {
       type: String,
@@ -18,11 +19,12 @@ router.post(
     },
     comment: {
       type: String,
-      required: true
+      required: false,
+      maxlength: 50
     },
     evaluation: {
       type: Number,
-      required: true
+      required: false
     }
   }),
   create

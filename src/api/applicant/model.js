@@ -43,10 +43,32 @@ const applicantSchema = new Schema({
     required: true,
     lowerCase: true
   },
-  event: {},
+  cvUrl: {
+    type: String,
+    required: true,
+    lowerCase: true
+  },
+  event: {
+    type: Schema.Types.ObjectId,
+    ref: 'Event',
+    required: true
+  },
+  createdBy: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
+  updatedBy: {
+    type: Schema.Types.ObjectId,
+    ref: 'User',
+    required: true
+  },
   createdAt: {
     type: Date,
     default: new Date()
+  },
+  updatedAt: {
+    type: Date
   }
 })
 
